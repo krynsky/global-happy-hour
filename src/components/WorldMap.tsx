@@ -18,8 +18,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeContainerRef.current || globe.current) return;
     
     try {
-      // Create globe instance correctly passing the DOM element
-      const globeInstance = Globe();
+      // Create globe instance with the new keyword
+      const globeInstance = new Globe();
       
       // Configure the globe
       globeInstance
