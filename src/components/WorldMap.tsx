@@ -19,7 +19,10 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     
     try {
       // Create globe instance with 'new' keyword
-      globe.current = new Globe()
+      globe.current = new Globe({ 
+        waitForGlobeReady: true,
+        animateIn: true
+      })
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
         .width(globeContainerRef.current.clientWidth)
@@ -93,11 +96,11 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         .ringPropagationSpeed('propagationSpeed')
         .ringRepeatPeriod('repeatPeriod');
       
-      // Point globe to the location
+      // Point globe to the location with a closer zoom (reduced altitude from 2.5 to 1.2)
       globe.current.pointOfView({
         lat: location.coordinates[1],
         lng: location.coordinates[0],
-        altitude: 2.5
+        altitude: 1.2
       }, 1000);
       
       // Disable auto-rotation after navigating to location
