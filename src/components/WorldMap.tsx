@@ -18,11 +18,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeContainerRef.current || globe.current) return;
     
     try {
-      // Create globe instance correctly by treating Globe as a factory function
-      // globe.gl exports a function that returns another function
       if (globeContainerRef.current) {
-        const globeInstance = Globe();
-        globe.current = globeInstance(globeContainerRef.current);
+        // Create globe instance with the 'new' keyword as required by the Globe constructor
+        globe.current = new Globe()(globeContainerRef.current);
         
         // Configure the globe
         globe.current
