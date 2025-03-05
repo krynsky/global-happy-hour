@@ -26,7 +26,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: DEFAULT_MAP_SETTINGS.style,
-        center: DEFAULT_MAP_SETTINGS.center,
+        center: DEFAULT_MAP_SETTINGS.center as [number, number],
         zoom: DEFAULT_MAP_SETTINGS.zoom,
         attributionControl: false,
         projection: 'globe',

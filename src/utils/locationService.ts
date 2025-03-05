@@ -6,7 +6,7 @@ export interface LocationResult {
   country: string;
   city: string;
   localTime: string;
-  coordinates: [number, number];
+  coordinates: [number, number]; // Explicitly typed as a tuple
   toastPhrase: {
     phrase: string;
     pronunciation: string;
@@ -50,7 +50,7 @@ export const findFiveOClockLocations = (): LocationResult[] => {
             minute: 'numeric',
             hour12: true 
           }),
-          coordinates: location.coordinates,
+          coordinates: location.coordinates as [number, number],
           toastPhrase: {
             phrase: toastInfo.phrase,
             pronunciation: toastInfo.pronunciation,
@@ -109,7 +109,7 @@ const createFallbackLocation = (): LocationResult => {
     country: location.country,
     city: location.city,
     localTime: "5:00 PM", // Simulated 5 PM
-    coordinates: location.coordinates,
+    coordinates: location.coordinates as [number, number],
     toastPhrase: {
       phrase: toastInfo.phrase,
       pronunciation: toastInfo.pronunciation,
