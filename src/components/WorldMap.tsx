@@ -18,11 +18,12 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeContainerRef.current || globe.current) return;
     
     try {
-      // Create globe instance with the new keyword
-      const globeInstance = new Globe({ waitForGlobeReady: true })(globeContainerRef.current);
+      // Create globe instance correctly: first create instance, then initialize with DOM element
+      const globeInstance = Globe();
+      globe.current = globeInstance(globeContainerRef.current);
       
       // Configure the globe
-      globeInstance
+      globe.current
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
         .width(globeContainerRef.current.clientWidth)
@@ -30,9 +31,6 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         .showAtmosphere(true)
         .atmosphereColor('lightskyblue')
         .atmosphereAltitude(0.1);
-      
-      // Store the instance
-      globe.current = globeInstance;
       
       // Set initial globe position
       globe.current.controls().autoRotate = true;
