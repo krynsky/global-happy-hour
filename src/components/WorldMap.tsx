@@ -18,8 +18,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeContainerRef.current || globe.current) return;
     
     try {
-      // Create globe instance
-      globe.current = Globe()
+      // Create globe instance with 'new' keyword
+      globe.current = new Globe()
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
         .width(globeContainerRef.current.clientWidth)
