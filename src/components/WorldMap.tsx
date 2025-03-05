@@ -18,27 +18,30 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeContainerRef.current || globe.current) return;
     
     try {
-      // Create globe instance correctly: first create instance, then initialize with DOM element
-      const globeInstance = Globe();
-      globe.current = globeInstance(globeContainerRef.current);
-      
-      // Configure the globe
-      globe.current
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-        .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-        .width(globeContainerRef.current.clientWidth)
-        .height(400)
-        .showAtmosphere(true)
-        .atmosphereColor('lightskyblue')
-        .atmosphereAltitude(0.1);
-      
-      // Set initial globe position
-      globe.current.controls().autoRotate = true;
-      globe.current.controls().autoRotateSpeed = 0.5;
-      
-      setTimeout(() => {
-        setGlobeLoaded(true);
-      }, 200);
+      // Create globe instance correctly by treating Globe as a factory function
+      // globe.gl exports a function that returns another function
+      if (globeContainerRef.current) {
+        const globeInstance = Globe();
+        globe.current = globeInstance(globeContainerRef.current);
+        
+        // Configure the globe
+        globe.current
+          .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+          .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+          .width(globeContainerRef.current.clientWidth)
+          .height(400)
+          .showAtmosphere(true)
+          .atmosphereColor('lightskyblue')
+          .atmosphereAltitude(0.1);
+        
+        // Set initial globe position
+        globe.current.controls().autoRotate = true;
+        globe.current.controls().autoRotateSpeed = 0.5;
+        
+        setTimeout(() => {
+          setGlobeLoaded(true);
+        }, 200);
+      }
       
       // Handle resize
       const handleResize = () => {
