@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import Globe from 'globe.gl';
 import { LocationResult } from '@/utils/locationService';
@@ -18,8 +17,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeContainerRef.current || globe.current) return;
     
     try {
-      // Create globe instance with the new keyword
-      const globeInstance = new Globe();
+      // Create globe instance with DOM element
+      const globeInstance = Globe()(globeContainerRef.current);
       
       // Configure the globe
       globeInstance
@@ -30,9 +29,6 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         .showAtmosphere(true)
         .atmosphereColor('lightskyblue')
         .atmosphereAltitude(0.1);
-      
-      // Mount the globe to the DOM
-      globeInstance(globeContainerRef.current);
       
       // Store the instance
       globe.current = globeInstance;
