@@ -18,18 +18,24 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeContainerRef.current || globe.current) return;
     
     try {
-      // Create globe instance with 'new' keyword
-      globe.current = new Globe({ 
-        waitForGlobeReady: true,
-        animateIn: true
-      })
+      // Create globe instance correctly passing the DOM element
+      const globeInstance = Globe();
+      
+      // Configure the globe
+      globeInstance
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
         .width(globeContainerRef.current.clientWidth)
         .height(400)
         .showAtmosphere(true)
         .atmosphereColor('lightskyblue')
-        .atmosphereAltitude(0.1)(globeContainerRef.current);
+        .atmosphereAltitude(0.1);
+      
+      // Mount the globe to the DOM
+      globeInstance(globeContainerRef.current);
+      
+      // Store the instance
+      globe.current = globeInstance;
       
       // Set initial globe position
       globe.current.controls().autoRotate = true;
@@ -96,7 +102,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         .ringPropagationSpeed('propagationSpeed')
         .ringRepeatPeriod('repeatPeriod');
       
-      // Point globe to the location with a closer zoom (reduced altitude from 2.5 to 1.2)
+      // Point globe to the location with a closer zoom
       globe.current.pointOfView({
         lat: location.coordinates[1],
         lng: location.coordinates[0],
