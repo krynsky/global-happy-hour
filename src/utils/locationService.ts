@@ -1,3 +1,4 @@
+
 import { TIME_ZONES, TOAST_PHRASES, DRINK_IMAGES } from './constants';
 
 // Interface for location result
@@ -26,19 +27,18 @@ export const findFiveOClockLocations = (): LocationResult[] => {
 
   TIME_ZONES.forEach(location => {
     try {
-      // Get the current time in this location's timezone
-      // Create a formatter for this specific timezone
-      const formatter = new Intl.DateTimeFormat('en-US', {
+      // Create a formatter for this specific timezone to get hours and minutes
+      const hourMinuteFormatter = new Intl.DateTimeFormat('en-US', {
         timeZone: location.timeZone,
         hour: 'numeric',
         minute: 'numeric',
         hour12: false
       });
       
-      // Format the date to get the localized time string
-      const localTimeStr = formatter.format(now);
+      // Format the date to get the localized time string in 24-hour format
+      const localTimeStr = hourMinuteFormatter.format(now);
       
-      // Extract hours from the formatted time string (expected format: "HH:MM")
+      // Extract hours and minutes from the formatted time string (expected format: "HH:MM")
       const [hoursStr, minutesStr] = localTimeStr.split(':');
       const hours = parseInt(hoursStr, 10);
       const minutes = parseInt(minutesStr, 10);
@@ -71,18 +71,16 @@ export const findFiveOClockLocations = (): LocationResult[] => {
           };
         }
 
-        // Create a new Date object to get proper time formatting
-        // We use the local timezone here, but with hours and minutes from the target timezone
-        const localDate = new Date();
-        localDate.setHours(hours);
-        localDate.setMinutes(minutes);
-        
-        // Format the time with minutes
-        const formattedTime = localDate.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
+        // Create a formatter that returns the time in 12-hour format with AM/PM
+        const timeFormatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: location.timeZone,
+          hour: 'numeric',
           minute: 'numeric',
-          hour12: true 
+          hour12: true
         });
+        
+        // Get the properly formatted time string directly from the timezone
+        const formattedTime = timeFormatter.format(now);
 
         fiveOClockLocations.push({
           country: location.country,
@@ -142,14 +140,26 @@ const createFallbackLocation = (): LocationResult => {
   
   // Generate a random minute value between 0-59 for more realistic time
   const randomMinute = Math.floor(Math.random() * 60);
-  const fallbackTime = new Date();
-  fallbackTime.setHours(17);
-  fallbackTime.setMinutes(randomMinute);
   
-  const formattedTime = fallbackTime.toLocaleTimeString('en-US', {
+  // Create a formatter for the specific timezone
+  const now = new Date();
+  const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: location.timeZone,
     hour: 'numeric',
     minute: 'numeric',
     hour12: true
+  });
+  
+  // Create a date that's set to 5 PM in the local timezone
+  const localDate = new Date(now);
+  localDate.setHours(17);
+  localDate.setMinutes(randomMinute);
+  
+  // Format the time consistently
+  const formattedTime = localDate.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: 'numeric',
+    hour12: true 
   });
   
   return {
