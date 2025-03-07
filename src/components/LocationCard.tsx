@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { LocationResult } from '@/utils/locationService';
 import { MapPin, Clock, MessageSquare, Image as ImageIcon, ImageOff } from 'lucide-react';
@@ -15,16 +14,15 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
   // Reliable fallback image that should always work
   const fallbackImageUrl = "https://placehold.co/800x450/27374d/FFF?text=Cheers!";
   
-  // Pre-load the fallback image to ensure it's available when needed
+  // Reset states when location changes
   React.useEffect(() => {
-    const img = new window.Image();
-    img.src = fallbackImageUrl;
-  }, [fallbackImageUrl]);
+    setImageLoaded(false);
+    setImageError(false);
+  }, [location]);
 
   const handleImageError = () => {
-    console.log("Switching to fallback image due to loading error");
+    console.log("Image failed to load:", location.drinkImage.url);
     setImageError(true);
-    // Reset loaded state since we're switching to fallback
     setImageLoaded(false);
   };
 
@@ -45,10 +43,9 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
           <img
             src={location.drinkImage.url}
             alt={location.drinkImage.description}
-            className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
+            className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setImageLoaded(true)}
             onError={handleImageError}
-            loading="eager" // Eagerly load the image to prioritize visibility
           />
         )}
         
@@ -58,7 +55,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
             <img
               src={fallbackImageUrl}
               alt="People toasting with drinks"
-              className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
+              className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setImageLoaded(true)}
             />
             <div className="absolute top-2 right-2 bg-white/90 rounded-full p-1 shadow-sm">

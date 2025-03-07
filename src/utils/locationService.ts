@@ -1,4 +1,3 @@
-
 import { TIME_ZONES, TOAST_PHRASES, DRINK_IMAGES } from './constants';
 
 // Interface for location result
@@ -51,9 +50,26 @@ export const findFiveOClockLocations = (): LocationResult[] => {
           toast => toast.country === location.country && toast.city === location.city
         ) || TOAST_PHRASES.find(toast => toast.country === location.country) || TOAST_PHRASES[0];
 
-        // Get a random drink image
-        const randomImageIndex = Math.floor(Math.random() * DRINK_IMAGES.length);
-        const drinkImage = DRINK_IMAGES[randomImageIndex];
+        // Get a random drink image with URL validation
+        let drinkImage;
+        let attempts = 0;
+        // Try up to 3 random images to avoid broken links
+        while (attempts < 3) {
+          const randomIndex = Math.floor(Math.random() * DRINK_IMAGES.length);
+          drinkImage = DRINK_IMAGES[randomIndex];
+          // Simple validation to ensure URL is not empty
+          if (drinkImage.url && drinkImage.url.startsWith('http')) {
+            break;
+          }
+          attempts++;
+        }
+        // Fallback if all attempts fail
+        if (!drinkImage || !drinkImage.url || !drinkImage.url.startsWith('http')) {
+          drinkImage = {
+            url: "https://placehold.co/800x450/27374d/FFF?text=Cheers!",
+            description: "Placeholder drink image"
+          };
+        }
 
         // Create a new Date object to get proper time formatting
         // We use the local timezone here, but with hours and minutes from the target timezone
@@ -78,10 +94,7 @@ export const findFiveOClockLocations = (): LocationResult[] => {
             pronunciation: toastInfo.pronunciation,
             description: toastInfo.description
           },
-          drinkImage: {
-            url: drinkImage.url,
-            description: drinkImage.description
-          }
+          drinkImage: drinkImage
         });
       }
     } catch (error) {
