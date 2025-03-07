@@ -37,7 +37,11 @@ export const findFiveOClockLocations = (): LocationResult[] => {
       // Calculate the timezone offset for this location by getting the hour in that timezone
       // and comparing it to the UTC hour
       const locationDate = new Date(now);
-      const locationOptions = { timeZone: location.timeZone, hour12: false, hour: 'numeric' };
+      const locationOptions = { 
+        timeZone: location.timeZone, 
+        hour12: false, 
+        hour: "numeric" // Fixed: Using "numeric" as literal type instead of string
+      };
       const locationHourStr = new Intl.DateTimeFormat('en-US', locationOptions).format(locationDate);
       const locationHour = parseInt(locationHourStr, 10);
       
@@ -88,8 +92,8 @@ export const findFiveOClockLocations = (): LocationResult[] => {
         // Format the local time explicitly with a 12-hour format
         const formattedTime = new Intl.DateTimeFormat('en-US', {
           timeZone: location.timeZone,
-          hour: 'numeric',
-          minute: 'numeric',
+          hour: "numeric", // Fixed: Using "numeric" as literal type instead of string
+          minute: "numeric", // Fixed: Using "numeric" as literal type instead of string
           hour12: true
         }).format(now);
         
