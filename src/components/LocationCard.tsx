@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { LocationResult } from '@/utils/locationService';
-import { MapPin, Clock, MessageSquare } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, Image } from 'lucide-react';
 
 interface LocationCardProps {
   location: LocationResult;
@@ -10,6 +10,17 @@ interface LocationCardProps {
 
 const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  // Fallback image URL in case the primary image fails to load
+  const fallbackImageUrl = "https://images.unsplash.com/photo-1567954970774-ba712e8e5764?auto=format&fit=crop&w=800&q=80";
+
+  const handleImageError = () => {
+    console.error("Error loading image:", location.drinkImage.url);
+    setImageError(true);
+    // Reset loaded state since we're switching to fallback
+    setImageLoaded(false);
+  };
 
   return (
     <div 
@@ -18,13 +29,20 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
       }`}
     >
       <div className="relative h-48 overflow-hidden">
-        <div className={`absolute inset-0 bg-gray-200 animate-pulse ${imageLoaded ? 'hidden' : 'block'}`}></div>
+        {/* Loading placeholder */}
+        <div className={`absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center ${imageLoaded ? 'hidden' : 'block'}`}>
+          <Image className="w-8 h-8 text-gray-400" />
+        </div>
+        
+        {/* Image with error handling */}
         <img
-          src={`${location.drinkImage.url}?auto=format&fit=crop&w=800&q=80`}
-          alt={location.drinkImage.description}
-          className={`w-full h-full object-cover transition-all duration-700 lazy-image ${imageLoaded ? '' : 'loading'}`}
+          src={imageError ? fallbackImageUrl : `${location.drinkImage.url}?auto=format&fit=crop&w=800&q=80`}
+          alt={imageError ? "People toasting with drinks" : location.drinkImage.description}
+          className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
           onLoad={() => setImageLoaded(true)}
+          onError={handleImageError}
         />
+        
         <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/60 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <p className="text-white text-xs font-light mb-1 opacity-80">It's 5 o'clock in:</p>
