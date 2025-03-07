@@ -29,11 +29,17 @@ export const findFiveOClockLocations = (): LocationResult[] => {
 
   TIME_ZONES.forEach(location => {
     try {
-      // Get the current time in this timezone using date-fns-tz
-      const formattedHour = formatInTimeZone(now, location.timeZone, 'H');
-      const hour = parseInt(formattedHour, 10);
+      // Get formatted time string in the timezone with 24-hour format
+      const formattedTimeIn24h = formatInTimeZone(
+        now, 
+        location.timeZone, 
+        'HH:mm'
+      );
       
-      // Check if it's 5 PM (17 in 24-hour format)
+      // Extract hour
+      const hour = parseInt(formattedTimeIn24h.split(':')[0], 10);
+      
+      // Check if it's between 5:00 PM and 5:59 PM (17:00-17:59 in 24-hour format)
       if (hour === 17) {
         // Find toast phrase for this country
         const toastInfo = TOAST_PHRASES.find(
@@ -61,7 +67,7 @@ export const findFiveOClockLocations = (): LocationResult[] => {
           };
         }
 
-        // Format the local time with a 12-hour format for display
+        // Format the local time with a 12-hour format using date-fns-tz
         const formattedTime = formatInTimeZone(
           now,
           location.timeZone,
