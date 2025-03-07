@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { LocationResult } from '@/utils/locationService';
-import { MapPin, Clock, MessageSquare, Image, AlertCircle } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, Image, ImageOff } from 'lucide-react';
 
 interface LocationCardProps {
   location: LocationResult;
@@ -14,6 +14,12 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
 
   // Reliable fallback image that should always work
   const fallbackImageUrl = "https://placehold.co/800x450/27374d/FFF?text=Cheers!";
+  
+  // Pre-load the fallback image to ensure it's available when needed
+  React.useEffect(() => {
+    const img = new Image();
+    img.src = fallbackImageUrl;
+  }, [fallbackImageUrl]);
 
   const handleImageError = () => {
     console.log("Switching to fallback image due to loading error");
@@ -42,17 +48,23 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
             className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
             onLoad={() => setImageLoaded(true)}
             onError={handleImageError}
+            loading="eager" // Eagerly load the image to prioritize visibility
           />
         )}
         
         {/* Fallback image - only shown after error */}
         {imageError && (
-          <img
-            src={fallbackImageUrl}
-            alt="People toasting with drinks"
-            className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
-            onLoad={() => setImageLoaded(true)}
-          />
+          <div className="relative w-full h-full">
+            <img
+              src={fallbackImageUrl}
+              alt="People toasting with drinks"
+              className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
+              onLoad={() => setImageLoaded(true)}
+            />
+            <div className="absolute top-2 right-2 bg-white/90 rounded-full p-1 shadow-sm">
+              <ImageOff className="w-4 h-4 text-gray-500" />
+            </div>
+          </div>
         )}
         
         <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/60 to-transparent"></div>
