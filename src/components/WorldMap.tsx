@@ -102,7 +102,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
       globe.current.pointOfView({
         lat: location.coordinates[1],
         lng: location.coordinates[0],
-        altitude: 1.2
+        altitude: 0.7  // Reduced from 1.2 to 0.7 for a closer view
       }, 1000);
       
       // Disable auto-rotation after navigating to location
@@ -122,6 +122,13 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
       globe.current.controls().autoRotate = true;
       globe.current.pointsData([]);
       globe.current.ringsData([]);
+      
+      // Reset to a wider view when no location is selected
+      globe.current.pointOfView({
+        lat: 0,
+        lng: 0,
+        altitude: 2.5
+      }, 1000);
     }
   }, [location]);
   
