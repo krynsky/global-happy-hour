@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { LocationResult } from '@/utils/locationService';
-import { MapPin, Clock, MessageSquare, Image } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, Image, AlertCircle } from 'lucide-react';
 
 interface LocationCardProps {
   location: LocationResult;
@@ -12,11 +12,11 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Fallback image URL in case the primary image fails to load
-  const fallbackImageUrl = "https://images.unsplash.com/photo-1575444298539-5773b09a9392?auto=format&fit=crop&w=800&q=80";
+  // Reliable fallback image that should always work
+  const fallbackImageUrl = "https://placehold.co/800x450/27374d/FFF?text=Cheers!";
 
   const handleImageError = () => {
-    console.error("Error loading image:", location.drinkImage.url);
+    console.log("Switching to fallback image due to loading error");
     setImageError(true);
     // Reset loaded state since we're switching to fallback
     setImageLoaded(false);
@@ -34,14 +34,26 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
           <Image className="w-8 h-8 text-gray-400" />
         </div>
         
-        {/* Image with error handling */}
-        <img
-          src={imageError ? fallbackImageUrl : location.drinkImage.url}
-          alt={imageError ? "People toasting with drinks" : location.drinkImage.description}
-          className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
-          onLoad={() => setImageLoaded(true)}
-          onError={handleImageError}
-        />
+        {/* Primary image with error handling */}
+        {!imageError && (
+          <img
+            src={location.drinkImage.url}
+            alt={location.drinkImage.description}
+            className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
+            onLoad={() => setImageLoaded(true)}
+            onError={handleImageError}
+          />
+        )}
+        
+        {/* Fallback image - only shown after error */}
+        {imageError && (
+          <img
+            src={fallbackImageUrl}
+            alt="People toasting with drinks"
+            className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
+            onLoad={() => setImageLoaded(true)}
+          />
+        )}
         
         <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/60 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -50,6 +62,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
         </div>
       </div>
       
+      {/* Info section */}
       <div className="p-5 space-y-4">
         <div className="flex items-center space-x-3">
           <Clock className="w-5 h-5 text-gold" />
