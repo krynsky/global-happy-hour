@@ -1,4 +1,3 @@
-
 import { TIME_ZONES, TOAST_PHRASES, DRINK_IMAGES } from './constants';
 import { format } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -27,42 +26,22 @@ export const findFiveOClockLocations = (): LocationResult[] => {
   const now = new Date();
   const fiveOClockLocations: LocationResult[] = [];
 
-  // Get current time in hours (UTC)
-  const currentUtcHour = now.getUTCHours();
-  const currentUtcMinutes = now.getUTCMinutes();
-  const currentUtcTime = currentUtcHour + (currentUtcMinutes / 60);
-
   TIME_ZONES.forEach(location => {
     try {
-      // Calculate the timezone offset for this location by getting the hour in that timezone
-      // and comparing it to the UTC hour
-      const locationDate = new Date(now);
-      const locationOptions = { 
-        timeZone: location.timeZone, 
-        hour12: false, 
-        hour: "numeric" as const // Fixed: Using "as const" to ensure TypeScript treats this as a literal type
-      };
-      const locationHourStr = new Intl.DateTimeFormat('en-US', locationOptions).format(locationDate);
-      const locationHour = parseInt(locationHourStr, 10);
+      // Get the current time in this timezone in 24-hour format
+      const locationTime = new Intl.DateTimeFormat('en-US', {
+        timeZone: location.timeZone,
+        hour: 'numeric' as const,
+        minute: 'numeric' as const,
+        hour12: false
+      }).format(now);
       
-      // Calculate timezone offset by checking the difference between location hour and UTC hour
-      // Account for day boundary crossings
-      let timezoneOffset = locationHour - currentUtcHour;
-      if (timezoneOffset > 12) timezoneOffset -= 24;
-      if (timezoneOffset < -12) timezoneOffset += 24;
+      // Parse hours and minutes
+      const [hourStr, minuteStr] = locationTime.split(':');
+      const hour = parseInt(hourStr, 10);
       
-      // Calculate what UTC time corresponds to 5 PM in this location
-      // If local time is 5 PM, then UTC time is (5 PM - offset)
-      const fivepmInUtc = (17 - timezoneOffset + 24) % 24;
-      
-      // Determine if current UTC time is within the 5-6 PM window for this location
-      // Need to handle the case where the window crosses midnight UTC
-      const isCurrentlyFivePM = 
-        (fivepmInUtc <= fivepmInUtc + 1) ? 
-          (currentUtcTime >= fivepmInUtc && currentUtcTime < fivepmInUtc + 1) :
-          (currentUtcTime >= fivepmInUtc || currentUtcTime < (fivepmInUtc + 1) % 24);
-
-      if (isCurrentlyFivePM) {
+      // Check if it's between 5:00 PM and 5:59 PM (17:00-17:59 in 24-hour format)
+      if (hour === 17) {
         // Find toast phrase for this country
         const toastInfo = TOAST_PHRASES.find(
           toast => toast.country === location.country && toast.city === location.city
@@ -92,8 +71,8 @@ export const findFiveOClockLocations = (): LocationResult[] => {
         // Format the local time explicitly with a 12-hour format
         const formattedTime = new Intl.DateTimeFormat('en-US', {
           timeZone: location.timeZone,
-          hour: "numeric" as const, // Fixed: Using "as const" to ensure TypeScript treats this as a literal type
-          minute: "numeric" as const, // Fixed: Using "as const" to ensure TypeScript treats this as a literal type
+          hour: 'numeric' as const,
+          minute: 'numeric' as const,
           hour12: true
         }).format(now);
         
