@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { LocationResult } from '@/utils/locationService';
-import { MapPin, Clock, MessageSquare, Image, ImageOff } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, Image as ImageIcon, ImageOff } from 'lucide-react';
 
 interface LocationCardProps {
   location: LocationResult;
@@ -17,7 +17,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
   
   // Pre-load the fallback image to ensure it's available when needed
   React.useEffect(() => {
-    const img = new Image();
+    const img = new window.Image();
     img.src = fallbackImageUrl;
   }, [fallbackImageUrl]);
 
@@ -37,7 +37,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
       <div className="relative h-48 overflow-hidden">
         {/* Loading placeholder */}
         <div className={`absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center ${imageLoaded ? 'hidden' : 'block'}`}>
-          <Image className="w-8 h-8 text-gray-400" />
+          <ImageIcon className="w-8 h-8 text-gray-400" />
         </div>
         
         {/* Primary image with error handling */}
