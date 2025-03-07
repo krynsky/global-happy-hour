@@ -1,5 +1,7 @@
 
 import { TIME_ZONES, TOAST_PHRASES, DRINK_IMAGES } from './constants';
+import { format, getHours } from 'date-fns';
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
 
 // Interface for location result
 export interface LocationResult {
@@ -27,13 +29,11 @@ export const findFiveOClockLocations = (): LocationResult[] => {
 
   TIME_ZONES.forEach(location => {
     try {
-      // Create a date object representing "now" in the target timezone
-      const options = { timeZone: location.timeZone, hour12: false };
-      const formatter = new Intl.DateTimeFormat('en-US', options);
-      const parts = formatter.formatToParts(now);
+      // Convert current time to the location's timezone
+      const locationTime = toZonedTime(now, location.timeZone);
       
-      // Extract hours from the formatted parts
-      const hour = parseInt(parts.find(part => part.type === 'hour')?.value || '0', 10);
+      // Get the hour in 24-hour format in that timezone
+      const hour = getHours(locationTime);
       
       // Check if it's between 5:00-5:59 PM (17:00-17:59) in this location
       if (hour === 17) {
@@ -63,17 +63,9 @@ export const findFiveOClockLocations = (): LocationResult[] => {
           };
         }
 
-        // Create a formatter that returns the complete time in 12-hour format with AM/PM
-        const timeFormatter = new Intl.DateTimeFormat('en-US', {
-          timeZone: location.timeZone,
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: true
-        });
+        // Format the current time in the location's timezone
+        const formattedTime = formatInTimeZone(locationTime, location.timeZone, 'h:mm a');
         
-        // Get the current formatted time in the location's timezone
-        const formattedTime = timeFormatter.format(now);
-
         fiveOClockLocations.push({
           country: location.country,
           city: location.city,
