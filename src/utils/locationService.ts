@@ -40,7 +40,7 @@ export const findFiveOClockLocations = (): LocationResult[] => {
       const locationOptions = { 
         timeZone: location.timeZone, 
         hour12: false, 
-        hour: "numeric" // Fixed: Using "numeric" as literal type instead of string
+        hour: "numeric" as const // Fixed: Using "as const" to ensure TypeScript treats this as a literal type
       };
       const locationHourStr = new Intl.DateTimeFormat('en-US', locationOptions).format(locationDate);
       const locationHour = parseInt(locationHourStr, 10);
@@ -92,8 +92,8 @@ export const findFiveOClockLocations = (): LocationResult[] => {
         // Format the local time explicitly with a 12-hour format
         const formattedTime = new Intl.DateTimeFormat('en-US', {
           timeZone: location.timeZone,
-          hour: "numeric", // Fixed: Using "numeric" as literal type instead of string
-          minute: "numeric", // Fixed: Using "numeric" as literal type instead of string
+          hour: "numeric" as const, // Fixed: Using "as const" to ensure TypeScript treats this as a literal type
+          minute: "numeric" as const, // Fixed: Using "as const" to ensure TypeScript treats this as a literal type
           hour12: true
         }).format(now);
         
