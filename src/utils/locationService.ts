@@ -1,5 +1,7 @@
 
 import { TIME_ZONES, TOAST_PHRASES, DRINK_IMAGES } from './constants';
+import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 // Interface for location result
 export interface LocationResult {
@@ -27,39 +29,62 @@ export const findFiveOClockLocations = (): LocationResult[] => {
 
   TIME_ZONES.forEach(location => {
     try {
-      // Get the current time in this location's timezone
-      const locationTime = new Date(now.toLocaleString('en-US', { timeZone: location.timeZone }));
-      const hours = locationTime.getHours();
+      // Get formatted time string in the timezone with 24-hour format
+      const formattedTimeIn24h = formatInTimeZone(
+        now, 
+        location.timeZone, 
+        'HH:mm'
+      );
       
-      // Check if it's between 5:00-5:59 PM in this location
-      if (hours === 17) {
+      // Extract hour
+      const hour = parseInt(formattedTimeIn24h.split(':')[0], 10);
+      
+      // Check if it's between 5:00 PM and 5:59 PM (17:00-17:59 in 24-hour format)
+      if (hour === 17) {
         // Find toast phrase for this country
         const toastInfo = TOAST_PHRASES.find(
           toast => toast.country === location.country && toast.city === location.city
         ) || TOAST_PHRASES.find(toast => toast.country === location.country) || TOAST_PHRASES[0];
 
-        // Get a random drink image
-        const randomImageIndex = Math.floor(Math.random() * DRINK_IMAGES.length);
-        const drinkImage = DRINK_IMAGES[randomImageIndex];
+        // Get a random drink image with URL validation
+        let drinkImage;
+        let attempts = 0;
+        // Try up to 3 random images to avoid broken links
+        while (attempts < 3) {
+          const randomIndex = Math.floor(Math.random() * DRINK_IMAGES.length);
+          drinkImage = DRINK_IMAGES[randomIndex];
+          // Simple validation to ensure URL is not empty
+          if (drinkImage.url && drinkImage.url.startsWith('http')) {
+            break;
+          }
+          attempts++;
+        }
+        // Fallback if all attempts fail
+        if (!drinkImage || !drinkImage.url || !drinkImage.url.startsWith('http')) {
+          drinkImage = {
+            url: "https://placehold.co/800x450/27374d/FFF?text=Cheers!",
+            description: "Placeholder drink image"
+          };
+        }
 
+        // Format the local time with a 12-hour format using date-fns-tz
+        const formattedTime = formatInTimeZone(
+          now,
+          location.timeZone,
+          'h:mm a'
+        );
+        
         fiveOClockLocations.push({
           country: location.country,
           city: location.city,
-          localTime: locationTime.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: 'numeric',
-            hour12: true 
-          }),
+          localTime: formattedTime,
           coordinates: location.coordinates as [number, number],
           toastPhrase: {
             phrase: toastInfo.phrase,
             pronunciation: toastInfo.pronunciation,
             description: toastInfo.description
           },
-          drinkImage: {
-            url: drinkImage.url,
-            description: drinkImage.description
-          }
+          drinkImage: drinkImage
         });
       }
     } catch (error) {
@@ -105,10 +130,16 @@ const createFallbackLocation = (): LocationResult => {
   const randomImageIndex = Math.floor(Math.random() * DRINK_IMAGES.length);
   const drinkImage = DRINK_IMAGES[randomImageIndex];
   
+  // Generate a random minute value between 0-59 for more realistic time
+  const randomMinute = Math.floor(Math.random() * 60).toString().padStart(2, '0');
+  
+  // Set time to 5 PM with random minutes
+  const formattedTime = `5:${randomMinute} PM`;
+  
   return {
     country: location.country,
     city: location.city,
-    localTime: "5:00 PM", // Simulated 5 PM
+    localTime: formattedTime,
     coordinates: location.coordinates as [number, number],
     toastPhrase: {
       phrase: toastInfo.phrase,

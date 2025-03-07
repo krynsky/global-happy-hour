@@ -1,4 +1,3 @@
-
 // Collection of toast phrases from around the world
 export const TOAST_PHRASES = [
   { country: "USA", city: "New York", phrase: "Cheers!", pronunciation: "cheers", description: "Simple and classic American toast." },
@@ -77,20 +76,20 @@ export const TIME_ZONES = [
   { country: "Peru", city: "Lima", timeZone: "America/Lima", coordinates: [-77.0428, -12.0464] as [number, number] }
 ];
 
-// Stock photos of people having drinks in different locations
+// Stock photos of people having drinks in different locations - Updated with more reliable image URLs
 export const DRINK_IMAGES = [
-  { id: 1, url: "https://images.unsplash.com/photo-1567954970774-ba712e8e5764", description: "Friends toasting at a rooftop bar" },
-  { id: 2, url: "https://images.unsplash.com/photo-1533030193357-c0e908046134", description: "Clinking wine glasses at sunset" },
-  { id: 3, url: "https://images.unsplash.com/photo-1575444298539-5773b09a9392", description: "Cheers at a cozy pub" },
-  { id: 4, url: "https://images.unsplash.com/photo-1509670572852-5a98117a87df", description: "Beers at an outdoor festival" },
-  { id: 5, url: "https://images.unsplash.com/photo-1517449905587-f80695d63356", description: "Cocktails at a beach bar" },
-  { id: 6, url: "https://images.unsplash.com/photo-1554668048-3a11388dba59", description: "Champagne celebration" },
-  { id: 7, url: "https://images.unsplash.com/photo-1568644396922-5c3bfae12521", description: "Sophisticated cocktail hour" },
-  { id: 8, url: "https://images.unsplash.com/photo-1600476031234-6c38818c4a52", description: "Craft beer tasting" },
-  { id: 9, url: "https://images.unsplash.com/photo-1556032548-33b0f0da2cb4", description: "Toasting at a vineyard" },
-  { id: 10, url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd", description: "Evening drinks with city view" },
-  { id: 11, url: "https://images.unsplash.com/photo-1515069845991-48553528b8e6", description: "Casual drinks with friends" },
-  { id: 12, url: "https://images.unsplash.com/photo-1549146616-0176fb3d47f2", description: "Cocktail party celebration" },
+  { id: 1, url: "https://images.pexels.com/photos/5409010/pexels-photo-5409010.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Friends toasting at a dinner party" },
+  { id: 2, url: "https://images.pexels.com/photos/3171837/pexels-photo-3171837.jpeg?auto=compress&cs=tinysrgb&w=800", description: "People toasting with beer glasses" },
+  { id: 3, url: "https://images.pexels.com/photos/3943297/pexels-photo-3943297.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Friends clinking wine glasses" },
+  { id: 4, url: "https://images.pexels.com/photos/696218/pexels-photo-696218.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Toasting champagne glasses" },
+  { id: 5, url: "https://images.pexels.com/photos/1097425/pexels-photo-1097425.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Friends drinking at night" },
+  { id: 6, url: "https://images.pexels.com/photos/4255489/pexels-photo-4255489.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Cheers with cocktails" },
+  { id: 7, url: "https://images.pexels.com/photos/1304473/pexels-photo-1304473.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Friends at a beach bar" },
+  { id: 8, url: "https://images.pexels.com/photos/3641979/pexels-photo-3641979.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Garden party with drinks" },
+  { id: 9, url: "https://images.pexels.com/photos/4255483/pexels-photo-4255483.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Cocktails at sunset" },
+  { id: 10, url: "https://images.pexels.com/photos/3825412/pexels-photo-3825412.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Clinking wine glasses at dinner" },
+  { id: 11, url: "https://images.pexels.com/photos/5691544/pexels-photo-5691544.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Friends toasting at home" },
+  { id: 12, url: "https://images.pexels.com/photos/5778892/pexels-photo-5778892.jpeg?auto=compress&cs=tinysrgb&w=800", description: "Celebration with drinks" }
 ];
 
 // Mapbox token placeholder - user needs to add their own
