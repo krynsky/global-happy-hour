@@ -28,10 +28,23 @@ export const findFiveOClockLocations = (): LocationResult[] => {
   TIME_ZONES.forEach(location => {
     try {
       // Get the current time in this location's timezone
-      const locationTime = new Date(now.toLocaleString('en-US', { timeZone: location.timeZone }));
-      const hours = locationTime.getHours();
+      // Create a formatter for this specific timezone
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: location.timeZone,
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+      });
       
-      // Check if it's between 5:00-5:59 PM in this location
+      // Format the date to get the localized time string
+      const localTimeStr = formatter.format(now);
+      
+      // Extract hours from the formatted time string (expected format: "HH:MM")
+      const [hoursStr, minutesStr] = localTimeStr.split(':');
+      const hours = parseInt(hoursStr, 10);
+      const minutes = parseInt(minutesStr, 10);
+      
+      // Check if it's between 5:00-5:59 PM (17:00-17:59) in this location
       if (hours === 17) {
         // Find toast phrase for this country
         const toastInfo = TOAST_PHRASES.find(
@@ -42,14 +55,23 @@ export const findFiveOClockLocations = (): LocationResult[] => {
         const randomImageIndex = Math.floor(Math.random() * DRINK_IMAGES.length);
         const drinkImage = DRINK_IMAGES[randomImageIndex];
 
+        // Create a new Date object to get proper time formatting
+        // We use the local timezone here, but with hours and minutes from the target timezone
+        const localDate = new Date();
+        localDate.setHours(hours);
+        localDate.setMinutes(minutes);
+        
+        // Format the time with minutes
+        const formattedTime = localDate.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: 'numeric',
+          hour12: true 
+        });
+
         fiveOClockLocations.push({
           country: location.country,
           city: location.city,
-          localTime: locationTime.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: 'numeric',
-            hour12: true 
-          }),
+          localTime: formattedTime,
           coordinates: location.coordinates as [number, number],
           toastPhrase: {
             phrase: toastInfo.phrase,
@@ -105,10 +127,22 @@ const createFallbackLocation = (): LocationResult => {
   const randomImageIndex = Math.floor(Math.random() * DRINK_IMAGES.length);
   const drinkImage = DRINK_IMAGES[randomImageIndex];
   
+  // Generate a random minute value between 0-59 for more realistic time
+  const randomMinute = Math.floor(Math.random() * 60);
+  const fallbackTime = new Date();
+  fallbackTime.setHours(17);
+  fallbackTime.setMinutes(randomMinute);
+  
+  const formattedTime = fallbackTime.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  });
+  
   return {
     country: location.country,
     city: location.city,
-    localTime: "5:00 PM", // Simulated 5 PM
+    localTime: formattedTime,
     coordinates: location.coordinates as [number, number],
     toastPhrase: {
       phrase: toastInfo.phrase,
