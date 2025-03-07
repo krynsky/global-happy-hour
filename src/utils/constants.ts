@@ -1,4 +1,3 @@
-
 // Collection of toast phrases from around the world
 export const TOAST_PHRASES = [
   { country: "USA", city: "New York", phrase: "Cheers!", pronunciation: "cheers", description: "Simple and classic American toast." },
@@ -79,18 +78,18 @@ export const TIME_ZONES = [
 
 // Stock photos of people having drinks in different locations
 export const DRINK_IMAGES = [
-  { id: 1, url: "https://images.unsplash.com/photo-1567954970774-ba712e8e5764", description: "Friends toasting at a rooftop bar" },
-  { id: 2, url: "https://images.unsplash.com/photo-1533030193357-c0e908046134", description: "Clinking wine glasses at sunset" },
-  { id: 3, url: "https://images.unsplash.com/photo-1575444298539-5773b09a9392", description: "Cheers at a cozy pub" },
-  { id: 4, url: "https://images.unsplash.com/photo-1509670572852-5a98117a87df", description: "Beers at an outdoor festival" },
-  { id: 5, url: "https://images.unsplash.com/photo-1517449905587-f80695d63356", description: "Cocktails at a beach bar" },
-  { id: 6, url: "https://images.unsplash.com/photo-1554668048-3a11388dba59", description: "Champagne celebration" },
-  { id: 7, url: "https://images.unsplash.com/photo-1568644396922-5c3bfae12521", description: "Sophisticated cocktail hour" },
-  { id: 8, url: "https://images.unsplash.com/photo-1600476031234-6c38818c4a52", description: "Craft beer tasting" },
-  { id: 9, url: "https://images.unsplash.com/photo-1556032548-33b0f0da2cb4", description: "Toasting at a vineyard" },
-  { id: 10, url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd", description: "Evening drinks with city view" },
-  { id: 11, url: "https://images.unsplash.com/photo-1515069845991-48553528b8e6", description: "Casual drinks with friends" },
-  { id: 12, url: "https://images.unsplash.com/photo-1549146616-0176fb3d47f2", description: "Cocktail party celebration" },
+  { id: 1, url: "https://images.unsplash.com/photo-1567954970774-ba712e8e5764?auto=format&fit=crop&w=800&q=80", description: "Friends toasting at a rooftop bar" },
+  { id: 2, url: "https://images.unsplash.com/photo-1533030193357-c0e908046134?auto=format&fit=crop&w=800&q=80", description: "Clinking wine glasses at sunset" },
+  { id: 3, url: "https://images.unsplash.com/photo-1575444298539-5773b09a9392?auto=format&fit=crop&w=800&q=80", description: "Cheers at a cozy pub" },
+  { id: 4, url: "https://images.unsplash.com/photo-1509670572852-5a98117a87df?auto=format&fit=crop&w=800&q=80", description: "Beers at an outdoor festival" },
+  { id: 5, url: "https://images.unsplash.com/photo-1517449905587-f80695d63356?auto=format&fit=crop&w=800&q=80", description: "Cocktails at a beach bar" },
+  { id: 6, url: "https://images.unsplash.com/photo-1554668048-3a11388dba59?auto=format&fit=crop&w=800&q=80", description: "Champagne celebration" },
+  { id: 7, url: "https://images.unsplash.com/photo-1568644396922-5c3bfae12521?auto=format&fit=crop&w=800&q=80", description: "Sophisticated cocktail hour" },
+  { id: 8, url: "https://images.unsplash.com/photo-1600476031234-6c38818c4a52?auto=format&fit=crop&w=800&q=80", description: "Craft beer tasting" },
+  { id: 9, url: "https://images.unsplash.com/photo-1556032548-33b0f0da2cb4?auto=format&fit=crop&w=800&q=80", description: "Toasting at a vineyard" },
+  { id: 10, url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80", description: "Evening drinks with city view" },
+  { id: 11, url: "https://images.unsplash.com/photo-1515069845991-48553528b8e6?auto=format&fit=crop&w=800&q=80", description: "Casual drinks with friends" },
+  { id: 12, url: "https://images.unsplash.com/photo-1549146616-0176fb3d47f2?auto=format&fit=crop&w=800&q=80", description: "Cocktail party celebration" },
 ];
 
 // Mapbox token placeholder - user needs to add their own

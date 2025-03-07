@@ -13,7 +13,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
   const [imageError, setImageError] = useState(false);
 
   // Fallback image URL in case the primary image fails to load
-  const fallbackImageUrl = "https://images.unsplash.com/photo-1567954970774-ba712e8e5764?auto=format&fit=crop&w=800&q=80";
+  const fallbackImageUrl = "https://images.unsplash.com/photo-1575444298539-5773b09a9392?auto=format&fit=crop&w=800&q=80";
 
   const handleImageError = () => {
     console.error("Error loading image:", location.drinkImage.url);
@@ -36,7 +36,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isVisible }) => {
         
         {/* Image with error handling */}
         <img
-          src={imageError ? fallbackImageUrl : `${location.drinkImage.url}?auto=format&fit=crop&w=800&q=80`}
+          src={imageError ? fallbackImageUrl : location.drinkImage.url}
           alt={imageError ? "People toasting with drinks" : location.drinkImage.description}
           className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? '' : 'opacity-0'}`}
           onLoad={() => setImageLoaded(true)}
