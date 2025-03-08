@@ -23,6 +23,9 @@ export interface LocationResult {
 const recentlyShownLocations: string[] = [];
 const MAX_RECENT_LOCATIONS = 10;
 
+// Keep track of the last location to avoid immediate repeats
+let lastShownLocation: string | null = null;
+
 /**
  * Find locations where it's currently between 5:00-5:59 PM
  */
@@ -100,59 +103,92 @@ export const findFiveOClockLocations = (): LocationResult[] => {
 
 /**
  * Get a random location where it's 5 o'clock,
- * avoiding recently shown locations when possible
+ * ensuring we don't repeat the same location consecutively
  */
 export const getRandomFiveOClockLocation = (): LocationResult => {
   const locations = findFiveOClockLocations();
+  let selectedLocation: LocationResult;
   
   // If we found locations where it's 5 PM
   if (locations.length > 0) {
-    // Filter out recently shown locations if possible
-    const unseenLocations = locations.filter(
-      location => !recentlyShownLocations.includes(`${location.city}, ${location.country}`)
-    );
+    // First, remove the last shown location from consideration to avoid immediate repeats
+    const filteredLocations = lastShownLocation 
+      ? locations.filter(loc => `${loc.city}, ${loc.country}` !== lastShownLocation)
+      : locations;
     
-    // If we have unseen locations, use one of those
-    if (unseenLocations.length > 0) {
-      const randomIndex = Math.floor(Math.random() * unseenLocations.length);
-      const selectedLocation = unseenLocations[randomIndex];
+    // If we have other locations after filtering (or if this is the first run)
+    if (filteredLocations.length > 0) {
+      // Next, filter out all recently shown locations if possible
+      const unseenLocations = filteredLocations.filter(
+        location => !recentlyShownLocations.includes(`${location.city}, ${location.country}`)
+      );
       
-      // Add to recently shown locations
-      addToRecentlyShown(`${selectedLocation.city}, ${selectedLocation.country}`);
+      // Choose from unseen locations if available, otherwise use filtered locations
+      const locationsToChooseFrom = unseenLocations.length > 0 ? unseenLocations : filteredLocations;
       
-      return selectedLocation;
+      // Select a random location from the available options
+      const randomIndex = Math.floor(Math.random() * locationsToChooseFrom.length);
+      selectedLocation = locationsToChooseFrom[randomIndex];
+    } else {
+      // If filtering out the last location leaves us with nothing (only one 5PM location exists)
+      // Then select a random location from all 5PM locations
+      const randomIndex = Math.floor(Math.random() * locations.length);
+      selectedLocation = locations[randomIndex];
+      
+      // In this case, we'll attempt to vary the experience by using a different drink image
+      // Find a drink image that wasn't used last time if possible
+      selectedLocation = assignNewDrinkImage(selectedLocation);
     }
-    
-    // If all current 5 o'clock locations have been recently shown,
-    // just pick a random one from all available
-    const randomIndex = Math.floor(Math.random() * locations.length);
-    const selectedLocation = locations[randomIndex];
-    
-    // Add to recently shown locations
-    addToRecentlyShown(`${selectedLocation.city}, ${selectedLocation.country}`);
-    
-    return selectedLocation;
+  } else {
+    // If no locations found where it's currently 5 PM, create a fallback
+    selectedLocation = createFallbackLocation();
   }
   
-  // If no locations found where it's currently 5 PM, create a fallback
-  const fallbackLocation = createFallbackLocation();
+  // Update the recently shown locations list
+  addToRecentlyShown(`${selectedLocation.city}, ${selectedLocation.country}`);
   
-  // Add fallback to recently shown to avoid repeats when possible
-  addToRecentlyShown(`${fallbackLocation.city}, ${fallbackLocation.country}`);
+  // Update the last shown location to avoid immediate repeats
+  lastShownLocation = `${selectedLocation.city}, ${selectedLocation.country}`;
   
-  return fallbackLocation;
+  return selectedLocation;
+};
+
+/**
+ * Assign a new drink image to a location to vary the experience
+ * when we have to show the same location again
+ */
+const assignNewDrinkImage = (location: LocationResult): LocationResult => {
+  // Get current drink images except the one we're using
+  const otherDrinkImages = DRINK_IMAGES.filter(
+    img => img.url !== location.drinkImage.url
+  );
+  
+  // If we have other images, pick a random one
+  if (otherDrinkImages.length > 0) {
+    const randomImageIndex = Math.floor(Math.random() * otherDrinkImages.length);
+    return {
+      ...location,
+      drinkImage: otherDrinkImages[randomImageIndex]
+    };
+  }
+  
+  // Otherwise just return the original location
+  return location;
 };
 
 /**
  * Add a location to the recently shown list
  */
 const addToRecentlyShown = (locationKey: string): void => {
-  // Add to the front of the array
-  recentlyShownLocations.unshift(locationKey);
-  
-  // Trim the array if it's too long
-  if (recentlyShownLocations.length > MAX_RECENT_LOCATIONS) {
-    recentlyShownLocations.pop();
+  // Don't add duplicates
+  if (!recentlyShownLocations.includes(locationKey)) {
+    // Add to the front of the array
+    recentlyShownLocations.unshift(locationKey);
+    
+    // Trim the array if it's too long
+    if (recentlyShownLocations.length > MAX_RECENT_LOCATIONS) {
+      recentlyShownLocations.pop();
+    }
   }
 };
 
@@ -161,17 +197,27 @@ const addToRecentlyShown = (locationKey: string): void => {
  * that avoids showing recently seen locations
  */
 const createFallbackLocation = (): LocationResult => {
-  // Get all locations that haven't been recently shown
-  const unseenLocations = TIME_ZONES.filter(
+  // Get all locations that aren't the last shown location
+  let availableLocations = lastShownLocation
+    ? TIME_ZONES.filter(location => `${location.city}, ${location.country}` !== lastShownLocation)
+    : TIME_ZONES;
+  
+  // If we filtered everything out (unlikely), reset to all locations
+  if (availableLocations.length === 0) {
+    availableLocations = TIME_ZONES;
+  }
+  
+  // Further filter to avoid recently shown locations if possible
+  const unseenLocations = availableLocations.filter(
     location => !recentlyShownLocations.includes(`${location.city}, ${location.country}`)
   );
   
-  // Choose from unseen locations or all locations if all have been seen
-  const availableLocations = unseenLocations.length > 0 ? unseenLocations : TIME_ZONES;
+  // Choose from unseen locations or all filtered locations if all have been seen
+  const locationsToChooseFrom = unseenLocations.length > 0 ? unseenLocations : availableLocations;
   
   // Get a random location
-  const randomLocationIndex = Math.floor(Math.random() * availableLocations.length);
-  const location = availableLocations[randomLocationIndex];
+  const randomLocationIndex = Math.floor(Math.random() * locationsToChooseFrom.length);
+  const location = locationsToChooseFrom[randomLocationIndex];
   
   const toastInfo = TOAST_PHRASES.find(
     toast => toast.country === location.country && toast.city === location.city
