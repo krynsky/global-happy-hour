@@ -43,7 +43,6 @@ export const getRandomFiveOClockLocation = (): LocationResult => {
       selectedLocation = locations[randomIndex];
       
       // In this case, we'll attempt to vary the experience by using a different drink image
-      // Find a drink image that wasn't used last time if possible
       selectedLocation = assignNewDrinkImage(selectedLocation);
     }
   } else {

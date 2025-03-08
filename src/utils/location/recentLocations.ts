@@ -3,7 +3,7 @@ import { LocationResult } from './types';
 
 // Keep track of recently shown locations (in-memory cache)
 const recentlyShownLocations: string[] = [];
-const MAX_RECENT_LOCATIONS = 10;
+const MAX_RECENT_LOCATIONS = 20; // Increase from 10 to better prevent repeats
 
 // Keep track of the last location to avoid immediate repeats
 let lastShownLocation: string | null = null;
@@ -43,4 +43,12 @@ export const getLastShownLocation = (): string | null => {
  */
 export const setLastShownLocation = (locationKey: string): void => {
   lastShownLocation = locationKey;
+};
+
+/**
+ * Clear recently shown locations when needed
+ * (useful when all locations have been seen)
+ */
+export const clearRecentlyShownLocations = (): void => {
+  recentlyShownLocations.length = 0;
 };
