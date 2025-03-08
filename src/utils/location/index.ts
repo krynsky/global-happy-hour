@@ -1,7 +1,7 @@
 
 // Main location service that brings together all the modules
 import { findFiveOClockLocations } from './fiveOClockFinder';
-import { addToRecentlyShown, getLastShownLocation, setLastShownLocation } from './recentLocations';
+import { addToRecentlyShown, getLastShownLocation, setLastShownLocation, getRecentlyShownLocations } from './recentLocations';
 import { assignNewDrinkImage } from './locationVariation'; 
 import { createFallbackLocation } from './fallbackLocation';
 import { formatLocationName } from './formattingUtilities';
@@ -61,4 +61,5 @@ export const getRandomFiveOClockLocation = (): LocationResult => {
 };
 
 // Export everything from the service
-export { findFiveOClockLocations, formatLocationName, LocationResult };
+export { findFiveOClockLocations, formatLocationName };
+export type { LocationResult };
