@@ -67,7 +67,6 @@ const Index = () => {
         
         <div className="flex flex-col items-center mb-16">
           <DrinkButton onClick={findLocation} isLoading={isLoading} />
-          <p className="text-amber-600 mt-3 text-sm font-medium">There may be issues with the time calculation that will be fixed</p>
         </div>
         
         {currentLocation && (
