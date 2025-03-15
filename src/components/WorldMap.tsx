@@ -1,6 +1,5 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import Globe from 'globe.gl';
 import { LocationResult } from '@/utils/locationService';
 
 interface WorldMapProps {
@@ -10,62 +9,77 @@ interface WorldMapProps {
 
 const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
   const globeContainerRef = useRef<HTMLDivElement>(null);
-  const globe = useRef<any>(null);
+  const globeRef = useRef<any>(null);
   const [globeLoaded, setGlobeLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   
   // Initialize globe on component mount
   useEffect(() => {
-    if (!globeContainerRef.current || globe.current) return;
+    // Only initialize if the container exists and we haven't already initialized
+    if (!globeContainerRef.current || globeRef.current) return;
     
-    try {
-      if (globeContainerRef.current) {
-        // Create globe instance with the correct initialization pattern
-        globe.current = new Globe(globeContainerRef.current);
+    // Dynamic import of Globe.gl to fix loading issues
+    const initGlobe = async () => {
+      try {
+        // Import Globe dynamically
+        const Globe = (await import('globe.gl')).default;
         
-        // Configure the globe
-        globe.current
-          .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-          .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-          .width(globeContainerRef.current.clientWidth)
-          .height(400)
-          .showAtmosphere(true)
-          .atmosphereColor('lightskyblue')
-          .atmosphereAltitude(0.1);
-        
-        // Set initial globe position
-        globe.current.controls().autoRotate = true;
-        globe.current.controls().autoRotateSpeed = 0.5;
-        
-        setTimeout(() => {
-          setGlobeLoaded(true);
-        }, 200);
+        if (globeContainerRef.current) {
+          // Create globe instance
+          const globe = Globe()(globeContainerRef.current);
+          
+          // Configure the globe
+          globe
+            .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+            .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+            .width(globeContainerRef.current.clientWidth)
+            .height(400)
+            .showAtmosphere(true)
+            .atmosphereColor('lightskyblue')
+            .atmosphereAltitude(0.1);
+          
+          // Set initial globe position
+          globe.controls().autoRotate = true;
+          globe.controls().autoRotateSpeed = 0.5;
+          
+          // Store the globe reference
+          globeRef.current = globe;
+          
+          setTimeout(() => {
+            setGlobeLoaded(true);
+          }, 200);
+        }
+      } catch (error) {
+        console.error('Error initializing globe:', error);
+        setLoadError(true);
       }
-      
-      // Handle resize
-      const handleResize = () => {
-        if (globeContainerRef.current && globe.current) {
-          globe.current.width(globeContainerRef.current.clientWidth);
-        }
-      };
-      
-      window.addEventListener('resize', handleResize);
-      
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        if (globe.current) {
-          // Clean up
-          globeContainerRef.current?.querySelector('canvas')?.remove();
-          globe.current = null;
-        }
-      };
-    } catch (error) {
-      console.error('Error initializing globe:', error);
-    }
+    };
+    
+    // Initialize the globe
+    initGlobe();
+    
+    // Handle resize
+    const handleResize = () => {
+      if (globeContainerRef.current && globeRef.current) {
+        globeRef.current.width(globeContainerRef.current.clientWidth);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (globeRef.current) {
+        // Proper cleanup
+        globeRef.current._destructor?.();
+        globeRef.current = null;
+      }
+    };
   }, []);
   
   // Update marker when location changes
   useEffect(() => {
-    if (!globe.current || !location) return;
+    if (!globeRef.current || !location) return;
     
     try {
       // Add point marker for the location
@@ -87,7 +101,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
       }];
       
       // Update globe with point and ring data
-      globe.current
+      globeRef.current
         .pointsData(pointData)
         .pointAltitude(0.1)
         .pointColor('color')
@@ -99,7 +113,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         .ringRepeatPeriod('repeatPeriod');
       
       // Point globe to the location with a closer zoom
-      globe.current.pointOfView({
+      globeRef.current.pointOfView({
         lat: location.coordinates[1],
         lng: location.coordinates[0],
         altitude: 0.7  // Reduced from 1.2 to 0.7 for a closer view
@@ -107,7 +121,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
       
       // Disable auto-rotation after navigating to location
       setTimeout(() => {
-        globe.current.controls().autoRotate = false;
+        globeRef.current.controls().autoRotate = false;
       }, 1000);
     } catch (error) {
       console.error('Error updating globe marker:', error);
@@ -116,15 +130,15 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
   
   // Re-enable auto-rotation when no location is selected
   useEffect(() => {
-    if (!globe.current) return;
+    if (!globeRef.current) return;
     
-    if (!location && globe.current.controls()) {
-      globe.current.controls().autoRotate = true;
-      globe.current.pointsData([]);
-      globe.current.ringsData([]);
+    if (!location && globeRef.current.controls()) {
+      globeRef.current.controls().autoRotate = true;
+      globeRef.current.pointsData([]);
+      globeRef.current.ringsData([]);
       
       // Reset to a wider view when no location is selected
-      globe.current.pointOfView({
+      globeRef.current.pointOfView({
         lat: 0,
         lng: 0,
         altitude: 2.5
@@ -141,11 +155,22 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     >
       <div className="absolute inset-0" ref={globeContainerRef}></div>
       
-      {!globeLoaded && (
+      {!globeLoaded && !loadError && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
           <div className="text-center">
             <div className="inline-block w-8 h-8 border-4 border-t-gold border-r-gold border-b-transparent border-l-transparent rounded-full animate-spin mb-2"></div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Loading globe...</p>
+          </div>
+        </div>
+      )}
+      
+      {loadError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+          <div className="text-center p-6">
+            <p className="text-amber-600 font-medium mb-2">Unable to load globe visualization</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Try refreshing the page or check your internet connection
+            </p>
           </div>
         </div>
       )}
