@@ -18,16 +18,24 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     // Only initialize if the container exists and we haven't already initialized
     if (!globeContainerRef.current || globeRef.current) return;
     
+    console.log("Attempting to initialize globe...");
+    
     // Dynamic import of Globe.gl to fix loading issues
     const initGlobe = async () => {
       try {
+        console.log("Importing Globe.gl...");
         // Import Globe dynamically
-        const Globe = (await import('globe.gl')).default;
+        const GlobeModule = await import('globe.gl');
+        const Globe = GlobeModule.default;
+        
+        console.log("Globe.gl imported successfully:", typeof Globe);
         
         if (globeContainerRef.current) {
-          // Create globe instance
-          // Use 'new' with the Globe constructor
-          const globe = new Globe(globeContainerRef.current);
+          console.log("Creating globe instance...");
+          // Create globe instance with new keyword
+          const globe = new Globe()(globeContainerRef.current);
+          
+          console.log("Globe instance created:", globe);
           
           // Configure the globe
           globe
@@ -49,6 +57,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
           setTimeout(() => {
             setGlobeLoaded(true);
           }, 200);
+          
+          console.log("Globe setup complete");
         }
       } catch (error) {
         console.error('Error initializing globe:', error);
