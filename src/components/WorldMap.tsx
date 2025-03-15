@@ -26,7 +26,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         
         if (globeContainerRef.current) {
           // Create globe instance
-          const globe = Globe()(globeContainerRef.current);
+          // Use 'new' with the Globe constructor
+          const globe = new Globe(globeContainerRef.current);
           
           // Configure the globe
           globe
