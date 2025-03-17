@@ -32,7 +32,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         
         if (globeContainerRef.current) {
           console.log("Creating globe instance...");
-          // Use the proper initialization syntax based on the Globe.gl API
+          // Create a new Globe instance with the container element
           const globe = new Globe(globeContainerRef.current);
           
           console.log("Globe instance created:", globe);
@@ -90,7 +90,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
   
   // Update marker when location changes
   useEffect(() => {
-    if (!globeRef.current || !location) return;
+    if (!globeRef.current || !location || !globeLoaded) return;
+    
+    console.log("Updating globe with location:", location.city, location.coordinates);
     
     try {
       // Add point marker for the location
@@ -124,6 +126,12 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         .ringRepeatPeriod('repeatPeriod');
       
       // Point globe to the location with a closer zoom
+      console.log("Setting pointOfView to:", {
+        lat: location.coordinates[1],
+        lng: location.coordinates[0],
+        altitude: 0.7
+      });
+      
       globeRef.current.pointOfView({
         lat: location.coordinates[1],
         lng: location.coordinates[0],
@@ -132,18 +140,20 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
       
       // Disable auto-rotation after navigating to location
       setTimeout(() => {
-        globeRef.current.controls().autoRotate = false;
+        if (globeRef.current && globeRef.current.controls) {
+          globeRef.current.controls().autoRotate = false;
+        }
       }, 1000);
     } catch (error) {
       console.error('Error updating globe marker:', error);
     }
-  }, [location]);
+  }, [location, globeLoaded]);
   
   // Re-enable auto-rotation when no location is selected
   useEffect(() => {
-    if (!globeRef.current) return;
+    if (!globeRef.current || !globeLoaded) return;
     
-    if (!location && globeRef.current.controls()) {
+    if (!location && globeRef.current.controls) {
       globeRef.current.controls().autoRotate = true;
       globeRef.current.pointsData([]);
       globeRef.current.ringsData([]);
@@ -155,7 +165,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         altitude: 2.5
       }, 1000);
     }
-  }, [location]);
+  }, [location, globeLoaded]);
   
   return (
     <div 
