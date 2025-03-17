@@ -47,16 +47,28 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
             .atmosphereColor('lightskyblue')
             .atmosphereAltitude(0.1);
           
-          // Set initial globe position
-          globe.controls().autoRotate = true;
-          globe.controls().autoRotateSpeed = 0.5;
-          
           // Store the globe reference
           globeRef.current = globe;
           
+          // Set initial globe position with a wider view
+          globe.pointOfView({
+            lat: 0,
+            lng: 0,
+            altitude: 2.5
+          });
+          
+          // Initialize auto-rotation
+          if (globe.controls) {
+            globe.controls().autoRotate = true;
+            globe.controls().autoRotateSpeed = 0.5;
+            console.log("Auto-rotation enabled");
+          }
+          
+          // Mark the globe as loaded after a short delay to ensure it's fully rendered
           setTimeout(() => {
+            console.log("Globe marked as loaded");
             setGlobeLoaded(true);
-          }, 200);
+          }, 500);
           
           console.log("Globe setup complete");
         }
@@ -82,6 +94,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
       window.removeEventListener('resize', handleResize);
       if (globeRef.current) {
         // Proper cleanup
+        console.log("Cleaning up globe instance");
         globeRef.current._destructor?.();
         globeRef.current = null;
       }
@@ -93,6 +106,10 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
     if (!globeRef.current || !location || !globeLoaded) return;
     
     console.log("Updating globe with location:", location.city, location.coordinates);
+    
+    // Reset any existing data
+    globeRef.current.pointsData([]);
+    globeRef.current.ringsData([]);
     
     try {
       // Add point marker for the location
@@ -132,18 +149,23 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         altitude: 0.7
       });
       
-      globeRef.current.pointOfView({
-        lat: location.coordinates[1],
-        lng: location.coordinates[0],
-        altitude: 0.7  // Reduced from 1.2 to 0.7 for a closer view
-      }, 1000);
-      
-      // Disable auto-rotation after navigating to location
+      // Force a render cycle before changing point of view
       setTimeout(() => {
-        if (globeRef.current && globeRef.current.controls) {
+        // Explicitly stop auto-rotation first
+        if (globeRef.current.controls && globeRef.current.controls()) {
+          console.log("Disabling auto-rotation");
           globeRef.current.controls().autoRotate = false;
         }
-      }, 1000);
+        
+        // Then set point of view with animation
+        globeRef.current.pointOfView({
+          lat: location.coordinates[1],
+          lng: location.coordinates[0],
+          altitude: 0.7  // Closer view
+        }, 1000); // 1 second animation
+        
+        console.log("Point of view updated");
+      }, 100);
     } catch (error) {
       console.error('Error updating globe marker:', error);
     }
@@ -153,16 +175,27 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
   useEffect(() => {
     if (!globeRef.current || !globeLoaded) return;
     
-    if (!location && globeRef.current.controls) {
-      globeRef.current.controls().autoRotate = true;
+    if (!location) {
+      console.log("No location selected, resetting globe view");
+      
+      // Clear existing data points
       globeRef.current.pointsData([]);
       globeRef.current.ringsData([]);
       
-      // Reset to a wider view when no location is selected
+      // Reset to default view
       globeRef.current.pointOfView({
         lat: 0,
         lng: 0,
         altitude: 2.5
+      }, 1000);
+      
+      // Re-enable auto-rotation
+      setTimeout(() => {
+        if (globeRef.current.controls && globeRef.current.controls()) {
+          console.log("Re-enabling auto-rotation");
+          globeRef.current.controls().autoRotate = true;
+          globeRef.current.controls().autoRotateSpeed = 0.5;
+        }
       }, 1000);
     }
   }, [location, globeLoaded]);
