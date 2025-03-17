@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { LocationResult } from '@/utils/locationService';
 
@@ -31,8 +32,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ location, isVisible }) => {
         
         if (globeContainerRef.current) {
           console.log("Creating globe instance...");
-          // Correct initialization: Globe is a function that returns a method we can call with our element
-          const globe = Globe()(globeContainerRef.current);
+          // Use the proper initialization syntax based on the Globe.gl API
+          const globe = new Globe(globeContainerRef.current);
           
           console.log("Globe instance created:", globe);
           
